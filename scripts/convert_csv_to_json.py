@@ -1,10 +1,11 @@
 import pandas as pd
 
+
 # Load the CSV file, skipping any header rows if necessary
 df = pd.read_csv('sheet.csv', skiprows=4)  # Adjust `skiprows` as needed
 
-# Rename the columns to be shorter and simpler
-df.columns = [
+# Define the simplified column names for the first 15 expected columns
+new_column_names = [
     "ref_no",
     "model",
     "case",
@@ -19,8 +20,12 @@ df.columns = [
     "first_year",
     "last_year",
     "first_price",
-    "last_price",
+    "last_price"
 ]
+
+# Rename only the columns we care about, ignoring any extra columns
+df = df.iloc[:, :len(new_column_names)]  # Select only the first 15 columns
+df.columns = new_column_names
 
 # Convert to JSON with indentation and save as watches.json
 df.to_json('watches.json', orient='records', indent=4)
