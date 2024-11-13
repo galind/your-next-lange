@@ -1,0 +1,53 @@
+name: Update Google Sheet Data to JSON
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Runs once a day at midnight (UTC)
+  workflow_dispatch:  # Allows manual triggering of the workflow
+
+jobs:
+  fetch_sheet:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Fetch Google Sheet as CSV
+        run: |
+          curl -L -o sheet.csv "https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv"
+      
+      - name: Convert CSV to JSON
+        run: |
+          # Skip the first few rows and convert to JSON format using jq
+          tail -n +5 sheet.csv | jq -R -s -c '
+          split("\n") | map(split(","))
+          | map(select(length > 1)) 
+          | map({
+              "ref_no": .[0],
+              "family_model": .[1],
+              "case_metal": .[2],
+              "dial": .[3],
+              "hands": .[4],
+              "strap": .[5],
+              "lug_buckle_width": .[6],
+              "case_size": .[7],
+              "movement_calibre": .[8],
+              "limited_edition": .[9],
+              "notes": .[10],
+              "first_year_made": .[11],
+              "latest_year_made": .[12],
+              "first_year_price": .[13],
+              "latest_price": .[14]
+          })' > sheet.json
+
+      - name: Commit and Push Changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add sheet.json
+          git commit -m "Update Google Sheet data"
+          git push
+
