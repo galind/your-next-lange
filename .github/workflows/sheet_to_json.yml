@@ -15,7 +15,7 @@ jobs:
 
       - name: Fetch Google Sheet as CSV
         run: |
-          curl -L -o sheet.csv "https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv"
+          curl -L -o sheet.csv "https://docs.google.com/spreadsheets/d/${{ secrets.SHEET_ID }}/export?format=csv"
       
       - name: Convert CSV to JSON
         run: |
