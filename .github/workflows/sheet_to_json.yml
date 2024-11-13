@@ -39,7 +39,7 @@ jobs:
               "latest_year_made": .[12],
               "first_year_price": .[13],
               "latest_price": .[14]
-          })' > sheet.json
+          })' | jq '.' > watches.json
 
       - name: Commit and Push Changes
         env:
@@ -47,7 +47,7 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add sheet.json
+          git add watches.json
           git commit -m "Update Google Sheet data"
           git push
 
