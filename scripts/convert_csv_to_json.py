@@ -27,6 +27,7 @@ new_column_names = [
 df = df.iloc[:, :len(new_column_names)]  # Select only the first 15 columns
 df.columns = new_column_names
 
-# Convert to JSON with indentation and save as watches.json
-df.to_json('watches.json', orient='records', indent=4)
+# Convert DataFrame to JSON format and write to file without escaping "/"
+with open('watches.json', 'w') as json_file:
+    json.dump(json.loads(df.to_json(orient='records')), json_file, indent=4, ensure_ascii=False)
 
