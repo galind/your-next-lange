@@ -35,7 +35,7 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
           # Check if there are changes to commit
-          if [[ -n "$(git status --porcelain)" ]]; then
+          if [[ -n "$(git status --porcelain  -untracked-files=no)" ]]; then
             git add watches.json
             git commit -m "Update Google Sheet data"
             git push
