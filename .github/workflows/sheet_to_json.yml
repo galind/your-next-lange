@@ -17,13 +17,21 @@ jobs:
         run: |
           pip install pandas
 
-      - name: Fetch Google Sheet as CSV
+      - name: Fetch Watches Google Sheet as CSV
         env:
           SHEET_ID: ${{ secrets.SHEET_ID }}
+          GID: ${{ secrets.WATCHES_GID }}
         run: |
-          curl -L -o sheet.csv "https://docs.google.com/spreadsheets/d/${{ env.SHEET_ID }}/export?format=csv"
+          curl -L -o watches.csv "https://docs.google.com/spreadsheets/d/${{ env.SHEET_ID }}/export?format=csv&gid=${{ env.GID }}"
 
-      - name: Convert CSV to JSON
+      - name: Fetch Movements Google Sheet as CSV
+        env:
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          GID: ${{ secrets.MOVEMENTS_GID }}
+        run: |
+          curl -L -o movements.csv "https://docs.google.com/spreadsheets/d/${{ env.SHEET_ID }}/export?format=csv&gid=${{ env.GID }}"
+
+      - name: Convert CSV files to JSON
         run: |
           python scripts/convert_csv_to_json.py
 
@@ -36,7 +44,7 @@ jobs:
 
           # Check if there are changes to commit
           if [[ -n "$(git status --porcelain --untracked-files=no)" ]]; then
-            git add watches.json
+            git add --all
             git commit -m "Update Google Sheet data"
             git push
           else
