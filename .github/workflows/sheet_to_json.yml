@@ -33,7 +33,13 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add watches.json
-          git commit -m "Update Google Sheet data"
-          git push
+
+          # Check if there are changes to commit
+          if [[ -n "$(git status --porcelain)" ]]; then
+            git add watches.json
+            git commit -m "Update Google Sheet data"
+            git push
+          else
+            echo "No changes to commit"
+          fi
 
