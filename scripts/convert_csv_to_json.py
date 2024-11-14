@@ -65,9 +65,8 @@ new_column_names = {
 }
 
 # Rename only the columns we care about, ignoring any extra columns
-watches_df = watches_df.iloc[:, :len(new_column_names)]  # Select only the first 15 columns
+watches_df = watches_df.iloc[:, :len(new_column_names["watches"])]  # Select only the first 15 columns
 watches_df.columns = new_column_names["watches"]
-
 movements_df.columns = new_column_names["movements"]
 
 # Convert DataFrame to JSON format and write to files without escaping "/"
