@@ -1,13 +1,34 @@
+import os
+import logging
 import pandas as pd
-import json
+from datetime import datetime
 
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
-# Load the CSV files, skipping any header rows if necessary
-watches_df = pd.read_csv('watches.csv', skiprows=4)  # Adjust `skiprows` as needed
-movements_df = pd.read_csv('movements.csv', skiprows=4)  # Adjust `skiprows` as needed
+# Helper functions
+def parse_date(date_str):
+    try:
+        return datetime.strptime(date_str, "%Y").strftime("%Y-%m-%d")
+    except ValueError:
+        return None
 
-# Define the simplified column names for the expected columns
-new_column_names = {
+def parse_number(value):
+    try:
+        return float(value.replace(",", "").strip())
+    except (ValueError, AttributeError):
+        return None
+
+def parse_boolean(value):
+    return value.strip().lower() in ["yes", "true", "1"]
+
+def handle_missing(value):
+    return value if value and value.strip() else None
+
+COLUMN_MAPPINGS = {
     "watches": [
         "ref_no",
         "model",
@@ -61,18 +82,45 @@ new_column_names = {
         "flyback",
         "split",
         "notes"
-    ],
+    ]
 }
 
-# Rename only the columns we care about, ignoring any extra columns
-watches_df = watches_df.iloc[:, :len(new_column_names["watches"])]  # Select only the first 15 columns
-watches_df.columns = new_column_names["watches"]
-movements_df.columns = new_column_names["movements"]
+def process_csv_to_json(input_file, output_file, mapping_key):
+    try:
+        logging.info(f"Loading CSV file: {input_file}")
+        df = pd.read_csv(input_file)
 
-# Convert DataFrame to JSON format and write to files without escaping "/"
-with open('watches.json', 'w') as json_file:
-    json.dump(json.loads(watches_df.to_json(orient='records')), json_file, indent=4, ensure_ascii=False)
+        # Apply column mapping
+        columns = COLUMN_MAPPINGS[mapping_key]
+        df = df.iloc[:, :len(columns)]
+        df.columns = columns
 
-with open("movements.json", "w") as json_file:
-    json.dump(json.loads(movements_df.to_json(orient='records')), json_file, indent=4, ensure_ascii=False)
+        # Transform data
+        if mapping_key == "watches":
+            df["size"] = df["size"].apply(parse_number)
+            df["first_year"] = df["first_year"].apply(parse_date)
+            df["last_year"] = df["last_year"].apply(parse_date)
+            df["first_price"] = df["first_price"].apply(parse_number)
+            df["last_price"] = df["last_price"].apply(parse_number)
+        elif mapping_key == "movements":
+            df["diameter"] = df["diameter"].apply(parse_number)
+            df["height"] = df["height"].apply(parse_number)
+            df["power_reserve"] = df["power_reserve"].apply(parse_number)
+            df["tourbillon"] = df["tourbillon"].apply(parse_boolean)
 
+        # Save to JSON
+        output_path = os.path.join("data", output_file)
+        logging.info(f"Saving JSON file: {output_path}")
+        df.to_json(output_path, orient="records", indent=4)
+
+    except Exception as e:
+        logging.error(f"Error processing file {input_file}: {e}")
+        raise
+
+if __name__ == "__main__":
+    files = [
+        {"input": "watches.csv", "output": "watches.json", "key": "watches"},
+        {"input": "movements.csv", "output": "movements.json", "key": "movements"}
+    ]
+    for file_info in files:
+        process_csv_to_json(file_info["input"], file_info["output"], file_info["key"])
