@@ -1,13 +1,14 @@
-import os
 import logging
-import pandas as pd
+import os
 from datetime import datetime
+
+import pandas as pd
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s"
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
+
 
 # Helper functions
 def parse_date(date_str):
@@ -16,17 +17,21 @@ def parse_date(date_str):
     except ValueError:
         return None
 
+
 def parse_number(value):
     try:
         return float(value.replace(",", "").strip())
     except (ValueError, AttributeError):
         return None
 
+
 def parse_boolean(value):
     return value.strip().lower() in ["yes", "true", "1"]
 
+
 def handle_missing(value):
     return value if value and value.strip() else None
+
 
 COLUMN_MAPPINGS = {
     "watches": [
@@ -44,7 +49,7 @@ COLUMN_MAPPINGS = {
         "first_year",
         "last_year",
         "first_price",
-        "last_price"
+        "last_price",
     ],
     "movements": [
         "calibre",
@@ -81,9 +86,10 @@ COLUMN_MAPPINGS = {
         "chronograph",
         "flyback",
         "split",
-        "notes"
-    ]
+        "notes",
+    ],
 }
+
 
 def process_csv_to_json(input_file, output_file, mapping_key):
     try:
@@ -92,7 +98,7 @@ def process_csv_to_json(input_file, output_file, mapping_key):
 
         # Apply column mapping
         columns = COLUMN_MAPPINGS[mapping_key]
-        df = df.iloc[:, :len(columns)]
+        df = df.iloc[:, : len(columns)]
         df.columns = columns
 
         # Transform data
@@ -117,10 +123,11 @@ def process_csv_to_json(input_file, output_file, mapping_key):
         logging.error(f"Error processing file {input_file}: {e}")
         raise
 
+
 if __name__ == "__main__":
     files = [
         {"input": "watches.csv", "output": "watches.json", "key": "watches"},
-        {"input": "movements.csv", "output": "movements.json", "key": "movements"}
+        {"input": "movements.csv", "output": "movements.json", "key": "movements"},
     ]
     for file_info in files:
         process_csv_to_json(file_info["input"], file_info["output"], file_info["key"])
