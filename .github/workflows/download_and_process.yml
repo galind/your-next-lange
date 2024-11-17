@@ -28,7 +28,7 @@ jobs:
       - name: Download Watches CSV
         env:
           SHEET_ID: ${{ secrets.SHEET_ID }}
-          GID: ${{ secrets.GID_WATCHES }}
+          GID: ${{ secrets.WATCHES_GID }}
         run: |
           SHEET_URL="https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}"
           echo "${SHEET_URL}"
@@ -37,7 +37,7 @@ jobs:
       - name: Download Movements CSV
         env:
           SHEET_ID: ${{ secrets.SHEET_ID }}
-          GID: ${{ secrets.GID_MOVEMENTS }}
+          GID: ${{ secrets.MOVEMENTS_GID }}
         run: |
           SHEET_URL="https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}"
           echo "${SHEET_URL}"
