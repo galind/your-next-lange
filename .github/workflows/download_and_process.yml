@@ -22,7 +22,8 @@ jobs:
         run: pip install pandas
 
       - name: Create Data Directory
-        run: mkdir data
+        run: |
+          mkdir -p data
 
       - name: Download Watches CSV
         env:
