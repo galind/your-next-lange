@@ -125,6 +125,9 @@ def process_csv_to_json(input_file, output_file, mapping_key):
 
 
 if __name__ == "__main__":
+    from sys import exit
+
+    exit(1)
     files = [
         {"input": "watches.csv", "output": "watches.json", "key": "watches"},
         {"input": "movements.csv", "output": "movements.json", "key": "movements"},
