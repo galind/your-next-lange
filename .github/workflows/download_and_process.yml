@@ -30,14 +30,18 @@ jobs:
           SHEET_ID: ${{ secrets.SHEET_ID_WATCHES }}
           GID: ${{ secrets.GID_WATCHES }}
         run: |
-          curl -L -o data/watches.csv "https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}"
+          SHEET_URL="https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}"
+          echo "${SHEET_URL}"
+          curl -L -o "data/watches.csv" "${SHEET_URL}"
 
       - name: Download Movements CSV
         env:
           SHEET_ID: ${{ secrets.SHEET_ID_MOVEMENTS }}
           GID: ${{ secrets.GID_MOVEMENTS }}
         run: |
-          curl -L -o data/movements.csv "https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}"
+          SHEET_URL="https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}"
+          echo "${SHEET_URL}"
+          curl -L -o "data/movements.csv" "${SHEET_URL}"
 
       - name: Convert CSV to JSON
         run: python scripts/csv_to_json.py
